@@ -140,14 +140,14 @@ header {
 
 <script>
 const sweets = [
-    {name:"Gulab Jamun", price:200},
-    {name:"Rasgulla", price:180},
-    {name:"Kaju Katli", price:600},
-    {name:"Jalebi", price:150},
-    {name:"Ladoo", price:250},
-    {name:"Barfi", price:300},
-    {name:"Peda", price:280},
-    {name:"Mysore Pak", price:350}
+    {name:"Gulab Jamun", price:200, unit:"kg"},
+    {name:"Rasgulla", price:180, unit:"kg"},
+    {name:"Kaju Katli", price:600, unit:"kg"},
+    {name:"Jalebi", price:150, unit:"kg"},
+    {name:"Ladoo", price:250, unit:"kg"},
+    {name:"Barfi", price:300, unit:"kg"},
+    {name:"Peda", price:280, unit:"kg"},
+    {name:"Mysore Pak", price:350, unit:"kg"}
 ];
 
 let orders = {};
@@ -164,7 +164,7 @@ sweets.forEach((item, index) => {
     productsDiv.innerHTML += `
         <div class="product">
             <h3>${item.name}</h3>
-            <p>₹${item.price}</p>
+            <p>₹${item.price} / ${item.unit}</p>
             <button onclick="addToCart(${index})">Add</button>
         </div>
     `;
@@ -189,7 +189,9 @@ function updateCart(name) {
 
     currentCart.forEach(item => {
         sum += item.price;
-        cartItems.innerHTML += `<li>${item.name} - ₹${item.price}</li>`;
+        cartItems.innerHTML += `
+            <li>${item.name} - ₹${item.price} / ${item.unit}</li>
+        `;
     });
 
     total.innerText = sum;
