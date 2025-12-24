@@ -2,87 +2,80 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sweets Shop</title>
+<title>Royal Mithai Palace</title>
 
 <style>
-/* ---------- PREMIUM BACKGROUND ---------- */
+/* ---------- PROFESSIONAL IMAGE BACKGROUND ---------- */
 body {
     margin: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #1d0f2f, #4b1248, #f953c6);
     min-height: 100vh;
+    color: white;
+    background: 
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url("https://images.unsplash.com/photo-1600628422019-54f94b6f8f5f");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 /* ---------- HEADER ---------- */
 header {
-    background: rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.5);
     backdrop-filter: blur(10px);
-    color: white;
     padding: 18px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
 .cart {
     font-size: 18px;
 }
 
-/* ---------- HERO SECTION ---------- */
+/* ---------- HERO ---------- */
 .banner {
     text-align: center;
-    color: white;
-    padding: 80px 20px;
+    padding: 60px 20px;
 }
 
-.banner h2 {
-    font-size: 42px;
-    margin-bottom: 10px;
+/* ---------- CUSTOMER ---------- */
+.customer-box {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.banner p {
-    font-size: 18px;
-    opacity: 0.9;
+.customer-box input {
+    padding: 12px 18px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    width: 280px;
+    font-size: 16px;
 }
 
 /* ---------- PRODUCTS ---------- */
 .products {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 25px;
     padding: 30px;
 }
 
 .product {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.18);
     backdrop-filter: blur(12px);
     border-radius: 15px;
     padding: 20px;
     text-align: center;
-    color: white;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-    transition: transform 0.3s;
-}
-
-.product:hover {
-    transform: translateY(-8px);
-}
-
-.product h3 {
-    margin-bottom: 10px;
-}
-
-.product p {
-    font-size: 18px;
-    font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
 .product button {
     margin-top: 10px;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
     border: none;
-    padding: 10px 15px;
+    padding: 10px 18px;
     border-radius: 20px;
     cursor: pointer;
     font-weight: bold;
@@ -90,13 +83,11 @@ header {
 
 /* ---------- CART ---------- */
 .cart-box {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.18);
     backdrop-filter: blur(12px);
     margin: 30px;
     padding: 25px;
     border-radius: 15px;
-    color: white;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
 }
 
 .cart-box ul {
@@ -113,11 +104,10 @@ header {
 .cart-box button {
     background: linear-gradient(135deg, #ff512f, #dd2476);
     border: none;
-    padding: 10px 18px;
-    border-radius: 20px;
+    padding: 12px 22px;
+    border-radius: 25px;
     color: white;
     cursor: pointer;
-    font-weight: bold;
 }
 </style>
 </head>
@@ -125,28 +115,30 @@ header {
 <body>
 
 <header>
-    <h1>🍬 Sweets Shop</h1>
-    <div class="cart">🛒 Cart (<span id="cartCount">0</span>)</div>
+    <h1>👑 Royal Mithai Palace</h1>
+    <div class="cart">🛒 Items: <span id="cartCount">0</span></div>
 </header>
 
 <section class="banner">
     <h2>Premium Indian Sweets</h2>
-    <p>Authentic Taste • Pure Ingredients • Royal Experience</p>
+    <p>Professional • Elegant • Multi-Customer Ordering</p>
 </section>
+
+<div class="customer-box">
+    <input type="text" id="customerName" placeholder="Enter Customer Name">
+</div>
 
 <section class="products" id="products"></section>
 
 <section class="cart-box">
-    <h2>Your Cart</h2>
+    <h2>Current Order</h2>
+    <p><strong>Customer:</strong> <span id="currentCustomer">None</span></p>
     <ul id="cartItems"></ul>
-    <h3>Total Price: ₹<span id="total">0</span></h3>
-    <button onclick="checkout()">Checkout</button>
+    <h3>Total: ₹<span id="total">0</span></h3>
+    <button onclick="checkout()">Place Order</button>
 </section>
 
 <script>
-// ---------- JAVASCRIPT ----------
-
-// Array of Objects
 const sweets = [
     {name:"Gulab Jamun", price:200},
     {name:"Rasgulla", price:180},
@@ -155,63 +147,67 @@ const sweets = [
     {name:"Ladoo", price:250},
     {name:"Barfi", price:300},
     {name:"Peda", price:280},
-    {name:"Mysore Pak", price:350},
-    {name:"Soan Papdi", price:220},
-    {name:"Halwa", price:200}
+    {name:"Mysore Pak", price:350}
 ];
 
-let cart = [];
+let orders = {};
+let currentCart = [];
 
 const productsDiv = document.getElementById("products");
 const cartItems = document.getElementById("cartItems");
 const total = document.getElementById("total");
 const cartCount = document.getElementById("cartCount");
+const customerNameInput = document.getElementById("customerName");
+const currentCustomer = document.getElementById("currentCustomer");
 
-// Display Products
 sweets.forEach((item, index) => {
     productsDiv.innerHTML += `
         <div class="product">
             <h3>${item.name}</h3>
             <p>₹${item.price}</p>
-            <button onclick="addToCart(${index})">Add to Cart</button>
+            <button onclick="addToCart(${index})">Add</button>
         </div>
     `;
 });
 
 function addToCart(index) {
-    cart.push(sweets[index]);
-    updateCart();
+    const name = customerNameInput.value.trim();
+    if (!name) {
+        alert("Customer name likh pehle bro!");
+        return;
+    }
+
+    if (!orders[name]) orders[name] = [];
+    orders[name].push(sweets[index]);
+    currentCart = orders[name];
+    updateCart(name);
 }
 
-function removeItem(i) {
-    cart.splice(i, 1);
-    updateCart();
-}
-
-function updateCart() {
+function updateCart(name) {
     cartItems.innerHTML = "";
     let sum = 0;
 
-    cart.forEach((item, i) => {
+    currentCart.forEach(item => {
         sum += item.price;
-        cartItems.innerHTML += `
-            <li>${item.name} - ₹${item.price}
-            <button onclick="removeItem(${i})">❌</button></li>
-        `;
+        cartItems.innerHTML += `<li>${item.name} - ₹${item.price}</li>`;
     });
 
     total.innerText = sum;
-    cartCount.innerText = cart.length;
+    cartCount.innerText = currentCart.length;
+    currentCustomer.innerText = name;
 }
 
 function checkout() {
-    if(cart.length === 0) {
-        alert("Your cart is empty!");
-    } else {
-        alert("Thank you for shopping at Sweets Shop 🍬");
-        cart = [];
-        updateCart();
+    const name = customerNameInput.value.trim();
+    if (!name || !orders[name] || orders[name].length === 0) {
+        alert("Order empty hai bro!");
+        return;
     }
+
+    alert(`Order placed successfully for ${name} 👑`);
+    orders[name] = [];
+    currentCart = [];
+    updateCart(name);
 }
 </script>
 
